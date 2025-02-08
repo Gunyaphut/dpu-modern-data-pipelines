@@ -11,7 +11,8 @@ import requests
 
 
 def _get_weather_data():
-    assert 1==2
+    # ใส่บรรทัดข้างล่างเพื่อให้โปรแกรม เออเร้อ และส่งมาในเมลล์
+    # assert 1==2
     # API_KEY = os.environ.get("WEATHER_API_KEY")
     API_KEY = Variable.get("weather_api_key")
 
