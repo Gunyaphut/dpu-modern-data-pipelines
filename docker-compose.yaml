@@ -73,6 +73,10 @@ x-airflow-common:
     # The following line can be used to set a custom config file, stored in the local config folder
     # If you want to use it, outcomment it and replace airflow.cfg with the name of your config file
     # AIRFLOW_CONFIG: '/opt/airflow/config/airflow.cfg'
+    AIRFLOW__SMTP__SMTP_HOST: mailhog
+    AIRFLOW__SMTP__SMTP_STARTTLS: 'false'
+    AIRFLOW__SMTP__SMTP_SSL: 'false'
+    AIRFLOW__SMTP__SMTP_PORT: 1025
   volumes:
     - ${AIRFLOW_PROJ_DIR:-.}/dags:/opt/airflow/dags
     - ${AIRFLOW_PROJ_DIR:-.}/logs:/opt/airflow/logs
@@ -232,58 +236,4 @@ services:
           echo
           echo -e "\033[1;33mWARNING!!!: You have not enough resources to run Airflow (see above)!\e[0m"
           echo "Please follow the instructions to increase amount of resources available:"
-          echo "   https://airflow.apache.org/docs/apache-airflow/stable/howto/docker-compose/index.html#before-you-begin"
-          echo
-        fi
-        mkdir -p /sources/logs /sources/dags /sources/plugins
-        chown -R "${AIRFLOW_UID}:0" /sources/{logs,dags,plugins}
-        exec /entrypoint airflow version
-    # yamllint enable rule:line-length
-    environment:
-      <<: *airflow-common-env
-      _AIRFLOW_DB_MIGRATE: 'true'
-      _AIRFLOW_WWW_USER_CREATE: 'true'
-      _AIRFLOW_WWW_USER_USERNAME: ${_AIRFLOW_WWW_USER_USERNAME:-airflow}
-      _AIRFLOW_WWW_USER_PASSWORD: ${_AIRFLOW_WWW_USER_PASSWORD:-airflow}
-      _PIP_ADDITIONAL_REQUIREMENTS: ''
-    user: "0:0"
-    volumes:
-      - ${AIRFLOW_PROJ_DIR:-.}:/sources
-
-  airflow-cli:
-    <<: *airflow-common
-    profiles:
-      - debug
-    environment:
-      <<: *airflow-common-env
-      CONNECTION_CHECK_MAX_COUNT: "0"
-    # Workaround for entrypoint issue. See: https://github.com/apache/airflow/issues/16252
-    command:
-      - bash
-      - -c
-      - airflow
-
-  # You can enable flower by adding "--profile flower" option e.g. docker-compose --profile flower up
-  # or by explicitly targeted on the command line e.g. docker-compose up flower.
-  # See: https://docs.docker.com/compose/profiles/
-  # flower:
-  #   <<: *airflow-common
-  #   command: celery flower
-  #   profiles:
-  #     - flower
-  #   ports:
-  #     - "5555:5555"
-  #   healthcheck:
-  #     test: ["CMD", "curl", "--fail", "http://localhost:5555/"]
-  #     interval: 30s
-  #     timeout: 10s
-  #     retries: 5
-  #     start_period: 30s
-  #   restart: always
-  #   depends_on:
-  #     <<: *airflow-common-depends-on
-  #     airflow-init:
-  #       condition: service_completed_successfully
-
-volumes:
-  postgres-db-volume:
+          echo "   https://airflow.apache.org/docs/apache-airflow/stable/h
